@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notizblock</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .notizblock-container {
+            width: 400px;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 24px;
+            color: #333;
+        }
+
+        textarea {
+            width: 100%;
+            height: 200px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+            resize: none;
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="notizblock-container">
+        <h1>Notizblock</h1>
+        <textarea id="notizen" placeholder="Schreibe hier deine Notizen..."></textarea>
+        <button onclick="speichereNotiz()">Speichern</button>
+        <button id="start-btn">Spracheingabe starten</button>
+        <button id="stop-btn" class="hidden">Spracheingabe stoppen</button>
+    </div>
+
+    <script>
+        // Lade gespeicherte Notizen aus Local Storage beim Laden der Seite
+        window.onload = () => document.getElementById("notizen").value = localStorage.getItem("notiz") || "";
+
+        // Funktion zum Speichern der Notizen im Local Storage
+        const speichereNotiz = () => {
+            localStorage.setItem("notiz", document.getElementById("notizen").value);
+            alert("Notiz gespeichert!");
+        };
+
+        // Spracherkennung
+        if ('webkitSpeechRecognition' in window) {
+            const recognition = new webkitSpeechRecognition();
+            recognition.lang = 'de-DE';
+            recognition.continuous = true;
+            recognition.onresult = e => document.getElementById('notizen').value += e.results[0][0].transcript + " ";
+
+            document.getElementById('start-btn').onclick = () => {
+                recognition.start();
+                toggleVisibility();
+            };
+
+            document.getElementById('stop-btn').onclick = () => {
+                recognition.stop();
+                toggleVisibility();
+            };
+
+            const toggleVisibility = () => {
+                document.getElementById('start-btn').classList.toggle('hidden');
+                document.getElementById('stop-btn').classList.toggle('hidden');
+            };
+        } else {
+            alert('Dieser Browser unterstützt keine Spracherkennung.');
+        }
+    </script>
+</body>
+</html>
